@@ -5,9 +5,9 @@ edition = "2021"
 authors = ["KIMWOOJUN <rladnwns625@naver.com>"]
 description = "Easy Binance API Wrapping Crate"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/wangki-kyu/windows_tts.git"
+repository = "https://github.com/wangki-kyu/crypto_trading"
 keywords = ["binance", "crypto", "trading"]
-categories = ["multimedia::audio"]
+categories = ["api-bindings", "finance"]
 
 [dependencies]
 anyhow = "1.0.97"
