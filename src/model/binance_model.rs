@@ -1,4 +1,5 @@
-use std::{default, time::{SystemTime, UNIX_EPOCH}};
+use core::fmt;
+use std::{default, fmt::{write, Display}, time::{SystemTime, UNIX_EPOCH}};
 
 use anyhow::{Context, Ok};
 use serde::{Deserialize, Serialize};
@@ -28,7 +29,7 @@ struct Balance {
 // 근데 여기서 필요한 것들은 모두 구현해야한다는거지...
 // 그것까지 자동화시켜야하나요?? 
 
-#[derive(Deserialize, Debug, Default, Clone)]
+#[derive(Deserialize, Default, Clone)]
 pub struct Kline {
     pub open_time: u64,  // 이 필드는 i64로 수정합니다.
     pub open: f64,
@@ -51,7 +52,20 @@ impl Kline {
     }
 }
 
-#[derive(Deserialize, Debug, Default, Clone)]
+impl fmt::Debug for Kline {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // 매크로 내에서 실제로 중괄호를 표현하려면 {{ -> { 이렇게 해야한다고함.
+        // std::fmt::Error는 데이터를 담을 수 없구나.
+        let open_str = utils::timestamp_to_local(self.open_time as i64).map_err(|_| std::fmt::Error)?;
+        let close_str = utils::timestamp_to_local(self.close_time as i64).map_err(|_| std::fmt::Error)?;
+        write!(f, 
+            "kline {{\n  open_time: {},\n  open: {},\n  high: {},\n  low: {},\n  close: {},\n  volume: {},\n  close_time: {}\n}}",  
+            open_str, self.open, self.high, self.low, self.close, self.volume, close_str
+        )
+    }
+}
+
+#[derive(Deserialize, Default, Clone)]
 pub struct Klines {
     pub kline_list: Vec<Kline>,
 }
@@ -61,8 +75,15 @@ impl  Klines {
         Klines { kline_list }
     }
 
-    pub fn print_last_nth_kline(&self, cnt: usize) {
+    // show first to cnt kline data
+    pub fn print_first_nth_kline(&self, cnt: usize) {
         self.kline_list.iter().take(cnt).for_each(|k| {
+            println!("{:?}", k);
+        });
+    }
+
+    pub fn print_last_nth_kline(&self, cnt: usize) {
+        self.kline_list.iter().rev().take(cnt).for_each(|k| {
             println!("{:?}", k);
         });
     }
@@ -70,6 +91,18 @@ impl  Klines {
     pub fn close_as_vec(&self) -> Vec<f64> {
         let close_slice = self.kline_list.iter().map(|k| k.close).collect::<Vec<f64>>();
         close_slice
+    }
+}
+
+impl fmt::Debug for Klines {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "klines {{")?;
+        writeln!(f, "  [")?;
+        for kline in &self.kline_list {
+            writeln!(f, "    {:?}", kline)?;
+        }
+        writeln!(f, "  ]")?;
+        write!(f, "}}")
     }
 }
 
