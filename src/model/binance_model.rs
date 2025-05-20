@@ -50,6 +50,31 @@ impl Kline {
         let time = utils::timestamp_to_local(self.close_time as i64)?;
         Ok(time)
     }
+
+    // 캔들의 바디의 top을 반환
+    pub fn get_candle_body_high(&self) -> f64 {
+        // 양봉 -> 종가
+        // 음봉 -> 시가
+        match self.is_green_candle() {
+            true => self.close,
+            false => self.open,
+        }
+    }
+
+    pub fn get_candle_body_low(&self) -> f64 {
+        match self.is_green_candle() {
+            true => self.open,
+            false => self.close,
+        }
+    }
+
+    // 양봉인지 체크
+    pub fn is_green_candle(&self) -> bool {
+        // 시가보다 종가가 높으면 양봉
+        // 시가보다 종가가 낮으면 음봉
+
+        self.open < self.close
+    }
 }
 
 impl fmt::Debug for Kline {
