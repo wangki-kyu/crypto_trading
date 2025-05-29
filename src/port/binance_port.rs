@@ -1,4 +1,6 @@
-use crate::model::binance_model::Klines;
+use std::future::Future;
+
+use crate::model::binance_model::{Klines, Ticker};
 
 pub trait UserPort {
    async fn get_account_balance(&self) -> anyhow::Result<String>;
@@ -9,7 +11,9 @@ pub trait UserPort {
 
 pub trait CommonPort {
    // async fn get_kline(&self) -> anyhow::Result<Klines>;
-   async fn get_kline(&self, symbol: &str, interval: &str, limit: Option<i32>) -> anyhow::Result<Klines>;
+   async fn get_kline(&self, symbol: String, interval: &str, limit: Option<i32>) -> anyhow::Result<Klines>;
+   async fn get_symbol_list(&self) -> anyhow::Result<Vec<String>>;
+   async fn get_symbol_with_volume(&self) -> anyhow::Result<Vec<Ticker>>;
 }
 
 // adapter는 raw date(json string)를 넘기도록 한다.

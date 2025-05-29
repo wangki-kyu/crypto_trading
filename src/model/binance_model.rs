@@ -29,8 +29,10 @@ struct Balance {
 // 근데 여기서 필요한 것들은 모두 구현해야한다는거지...
 // 그것까지 자동화시켜야하나요?? 
 
-#[derive(Deserialize, Default, Clone)]
+#[derive(Serialize,Deserialize, Default, Clone)]
 pub struct Kline {
+    pub symbol: String,
+    pub interval: String,
     pub open_time: u64,  // 이 필드는 i64로 수정합니다.
     pub open: f64,
     pub high: f64,
@@ -38,6 +40,7 @@ pub struct Kline {
     pub close: f64,
     pub volume: f64,
     pub close_time: u64,
+    pub idx: u64,
 }
 
 impl Kline {
@@ -188,40 +191,52 @@ pub enum CommonEndpoint {
     }, 
     OrderBook,
     RecentTradesList,
-    HistoricalTrades
+    HistoricalTrades,
+    ExchnageInfo,
+    Ticker,
 }
 
 impl From<CommonEndpoint> for String {
     fn from(value: CommonEndpoint) -> Self {
         match value {
             CommonEndpoint::Klines { symbol, interval, limit } => {
-                let limit_or_default = limit.unwrap_or(500);
-                // format!("/fapi/v1/klines?symbol={}&interval={}&limit={}", symbol, interval, limit_or_default)
-                format!("/fapi/v1/klines")
-            },
+                                let limit_or_default = limit.unwrap_or(500);
+                                // format!("/fapi/v1/klines?symbol={}&interval={}&limit={}", symbol, interval, limit_or_default)
+                                format!("/fapi/v1/klines")
+                            },
             CommonEndpoint::OrderBook => {
-                "".to_string()
-            },
+                                "".to_string()
+                            },
             CommonEndpoint::RecentTradesList => {
-                "".to_string()
-            },
+                                "".to_string()
+                            },
             CommonEndpoint::HistoricalTrades => {
-                "".to_string()
-            }
+                                "".to_string()
+                            }
+            CommonEndpoint::ExchnageInfo => {
+                        "/fapi/v1/exchangeInfo".to_string()
+                    }
+            CommonEndpoint::Ticker => {
+                        "/fapi/v1/ticker/24hr".to_string()
+            },
         }
     }
 }
 
+/// qeury를 손쉽게 만들기 위한 Endpoint trait 구현
+/// query!()를 하면 empty string이 반환된다.
 impl Endpoint for CommonEndpoint {
     fn query(&self) -> String {
         match self {
             CommonEndpoint::Klines { symbol, interval, limit } => {
-                let limit = limit.unwrap_or(500);
-                query!(symbol, interval, limit)   
-            },
+                                let limit = limit.unwrap_or(500);
+                                query!(symbol, interval, limit)   
+                            },
             CommonEndpoint::OrderBook => todo!(),
             CommonEndpoint::RecentTradesList => todo!(),
             CommonEndpoint::HistoricalTrades => todo!(),
+            CommonEndpoint::ExchnageInfo => query!(),
+            CommonEndpoint::Ticker => query!(),
         }
     }
 }
@@ -417,4 +432,28 @@ impl Order {
             callback_rate,
         }
     }
+}
+
+// #[derive(Debug, Deserialize)]
+// pub struct BinanceSymbols {
+    
+// }
+
+/// exchangeInfo 
+#[derive(Debug, Deserialize)]
+pub struct BinanceSymbol {
+    pub symbol: String,
+}
+
+/// Ticker
+#[derive(Debug, Deserialize)]
+pub struct Tickers {
+    tickers: Vec<Ticker>
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Ticker {
+    pub symbol: String,
+    #[serde(rename = "quoteVolume")]
+    pub quote_volume: String,
 }

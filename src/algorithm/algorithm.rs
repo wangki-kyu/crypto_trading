@@ -29,7 +29,7 @@ pub fn ema(prices : &[f64], period : usize) -> Vec<f64> {
     return ema_values;
 }
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize)]
 pub struct EMA {
     open_time: u64,
     close_time: u64,
@@ -59,7 +59,6 @@ impl fmt::Debug for EMA {
         write!(f, "EMA: {{\n  open_time: {},\n  close_time: {},\n  period: {},\n  ema_data: {}\n}}", open_time, close_time, self.period, self.ema_data)
     }
 }
-
 
 pub fn ema_kline(prices : Klines, period : usize) -> Vec<EMA> {
     let k = 2.0 / ( period as f64 + 1.0);
