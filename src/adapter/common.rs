@@ -113,9 +113,9 @@ impl CommonPort for BinanceCommon{
             .map(|t| t.clone())
             .collect();
 
-        parsed.iter().for_each(|t| {
-            println!("symbol: {}, quoteVolume: {}", t.symbol, t.quote_volume);
-        });
+        // parsed.iter().for_each(|t| {
+        //     println!("symbol: {}, quoteVolume: {}", t.symbol, t.quote_volume);
+        // });
 
         Ok(parsed)
     }
