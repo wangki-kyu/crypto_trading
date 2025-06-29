@@ -29,21 +29,23 @@ pub fn ema(prices : &[f64], period : usize) -> Vec<f64> {
     return ema_values;
 }
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, serde::Serialize, Default)]
 pub struct EMA {
     open_time: u64,
     close_time: u64,
     period: usize,
     ema_data: f64,
+    pub idx: usize,
 }
 
 impl EMA {
-    pub fn new(open_time: u64, close_time: u64, period: usize, ema_data: f64) -> Self {
+    pub fn new(open_time: u64, close_time: u64, period: usize, ema_data: f64, idx: usize) -> Self {
         Self {
             open_time,
             close_time,
             period,
             ema_data,
+            idx
         }
     }
 
@@ -68,12 +70,12 @@ pub fn ema_kline(prices : Klines, period : usize) -> Vec<EMA> {
     let sma: f64 = prices.kline_list[..period].iter().map(|k| {
         k.close
     }).sum::<f64>() / period as f64;
-    ema_values.push(EMA::new(0, 0, 0, sma));
+    ema_values.push(EMA::new(0, 0, 0, sma, 0));
 
-    for kline in prices.kline_list.iter() {
+    for (idx, kline) in prices.kline_list.iter().enumerate() {
         let prev_ema = ema_values.last().unwrap().ema_data;      
         let ema = (kline.close * k) + (prev_ema * (1.0 - k));
-        ema_values.push(EMA::new(kline.open_time, kline.close_time, period, ema));
+        ema_values.push(EMA::new(kline.open_time, kline.close_time, period, ema, idx));
     }
 
     ema_values.remove(0);

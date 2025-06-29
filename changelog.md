@@ -1,4 +1,7 @@
-. Minor | - Fix | + Addition | ^ improvement | ! Change | * Refactor
+. Minor | - Fix | + Addition | ^ improvement | ! Change | * Refactor | @ Version
+### v0.2.1
+`@` Version: `crates.io` update
+
 ### v0.2.1-dev
 `+` Addition: `Ticker` 가져오기 기능 추가 
 
