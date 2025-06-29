@@ -1,4 +1,7 @@
 . Minor | - Fix | + Addition | ^ improvement | ! Change | * Refactor | @ Version
+### v0.2.2
+`@` Version: version issue
+
 ### v0.2.1
 `@` Version: `crates.io` update
 
